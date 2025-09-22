@@ -64,11 +64,22 @@ func set(c echo.Context, name, msg string, kv ...string) {
 		Value: m.Encode(),
 		Path:  "/",
 	})
-}
 
-func WithFlashMessages(c echo.Context) context.Context {
 	ctx := c.Request().Context()
 
+	switch name {
+	case flashSuccess:
+		ctx = context.WithValue(ctx, FlashSuccessKey{}, &m)
+	case flashWarning:
+		ctx = context.WithValue(ctx, FlashWarningKey{}, &m)
+	case flashErr:
+		ctx = context.WithValue(ctx, FlashErrorKey{}, &m)
+	}
+
+	c.SetRequest(c.Request().WithContext(ctx))
+}
+
+func WithFlashMessages(ctx context.Context, c echo.Context) context.Context {
 	if msg := getSuccess(c); msg != nil {
 		ctx = context.WithValue(ctx, FlashSuccessKey{}, msg)
 	}
@@ -97,34 +108,34 @@ func getError(c echo.Context) *FlashMessage {
 }
 
 func get(c echo.Context, name string) *FlashMessage {
-	resp := c.Response()
-	kk := resp.Header().Get("Set-Cookie")
+	// resp := c.Response()
+	// kk := resp.Header().Get("Set-Cookie")
 
 	var cookie *http.Cookie
 	var err error
 
-	if kk == "" {
-		cookie, err = c.Cookie(name)
-		if err != nil {
-			return nil
-		}
-	} else {
-		cookies, err := http.ParseCookie(kk)
-		if err != nil {
-			cookie, err = c.Cookie(name)
-			if err != nil {
-				return nil
-			}
-		}
-
-		for _, c := range cookies {
-			if c.Name == name {
-				cookie = c
-				resp.Header().Del("Set-Cookie")
-				break
-			}
-		}
+	// if kk == "" {
+	cookie, err = c.Cookie(name)
+	if err != nil {
+		return nil
 	}
+	// } else {
+	// 	cookies, err := http.ParseCookie(kk)
+	// 	if err != nil {
+	// 		cookie, err = c.Cookie(name)
+	// 		if err != nil {
+	// 			return nil
+	// 		}
+	// 	}
+
+	// 	for _, c := range cookies {
+	// 		if c.Name == name {
+	// 			cookie = c
+	// 			resp.Header().Del("Set-Cookie")
+	// 			break
+	// 		}
+	// 	}
+	// }
 
 	if cookie == nil {
 		return nil
