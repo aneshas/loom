@@ -97,8 +97,36 @@ func getError(c echo.Context) *FlashMessage {
 }
 
 func get(c echo.Context, name string) *FlashMessage {
-	cookie, err := c.Cookie(name)
-	if err != nil {
+	resp := c.Response()
+	kk := resp.Header().Get("Set-Cookie")
+
+	var cookie *http.Cookie
+	var err error
+
+	if kk == "" {
+		cookie, err = c.Cookie(name)
+		if err != nil {
+			return nil
+		}
+	} else {
+		cookies, err := http.ParseCookie(kk)
+		if err != nil {
+			cookie, err = c.Cookie(name)
+			if err != nil {
+				return nil
+			}
+		}
+
+		for _, c := range cookies {
+			if c.Name == name {
+				cookie = c
+				resp.Header().Del("Set-Cookie")
+				break
+			}
+		}
+	}
+
+	if cookie == nil {
 		return nil
 	}
 
