@@ -10,19 +10,30 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type FlashSuccessKey struct{}
-type FlashWarningKey struct{}
-type FlashErrorKey struct{}
+type FlashKey struct{}
 
-const (
-	flashSuccess = "hyper_flash_success"
-	flashWarning = "hyper_flash_warning"
-	flashErr     = "hyper_flash_error"
-)
+const flashCookieName = "loom_flash_message"
 
-func newMessage(msg string, kv ...string) FlashMessage {
+func FlashMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		ctx := c.Request().Context()
+
+		msg := get(c)
+		if msg != nil {
+			ctx = context.WithValue(ctx, FlashKey{}, msg)
+			clear(c)
+		}
+
+		c.SetRequest(c.Request().WithContext(ctx))
+
+		return next(c)
+	}
+}
+
+func newMessage(msg string, t string, kv ...string) *FlashMessage {
 	m := FlashMessage{
 		Message: msg,
+		Type:    t,
 		Params:  make(map[string]string),
 	}
 
@@ -30,11 +41,12 @@ func newMessage(msg string, kv ...string) FlashMessage {
 		m.Params[kv[i]] = kv[i+1]
 	}
 
-	return m
+	return &m
 }
 
 type FlashMessage struct {
 	Message string
+	Type    string
 	Params  map[string]string
 }
 
@@ -44,98 +56,49 @@ func (m FlashMessage) Encode() string {
 	return encode(data)
 }
 
-func FlashSuccess(c echo.Context, msg string, kv ...string) {
-	set(c, flashSuccess, msg, kv...)
+func FlashSuccessNow(c echo.Context, msg string, kv ...string) {
+	setNow(c, newMessage(msg, "success", kv...))
 }
 
-func FlashWarning(c echo.Context, msg string, kv ...string) {
-	set(c, flashWarning, msg, kv...)
+func FlashWarningNow(c echo.Context, msg string, kv ...string) {
+	setNow(c, newMessage(msg, "warning", kv...))
 }
 
-func FlashError(c echo.Context, msg string, kv ...string) {
-	set(c, flashErr, msg, kv...)
+func FlashErrorNow(c echo.Context, msg string, kv ...string) {
+	setNow(c, newMessage(msg, "error", kv...))
 }
 
-func set(c echo.Context, name, msg string, kv ...string) {
-	m := newMessage(msg, kv...)
-
-	c.SetCookie(&http.Cookie{
-		Name:  name,
-		Value: m.Encode(),
-		Path:  "/",
-	})
-
-	ctx := c.Request().Context()
-
-	switch name {
-	case flashSuccess:
-		ctx = context.WithValue(ctx, FlashSuccessKey{}, &m)
-	case flashWarning:
-		ctx = context.WithValue(ctx, FlashWarningKey{}, &m)
-	case flashErr:
-		ctx = context.WithValue(ctx, FlashErrorKey{}, &m)
-	}
-
+func setNow(c echo.Context, msg *FlashMessage) {
+	ctx := context.WithValue(c.Request().Context(), FlashKey{}, msg)
 	c.SetRequest(c.Request().WithContext(ctx))
 }
 
-func WithFlashMessages(ctx context.Context, c echo.Context) context.Context {
-	if msg := getSuccess(c); msg != nil {
-		ctx = context.WithValue(ctx, FlashSuccessKey{}, msg)
-	}
-
-	if msg := getWarning(c); msg != nil {
-		ctx = context.WithValue(ctx, FlashWarningKey{}, msg)
-	}
-
-	if msg := getError(c); msg != nil {
-		ctx = context.WithValue(ctx, FlashErrorKey{}, msg)
-	}
-
-	return ctx
+func FlashSuccess(c echo.Context, msg string, kv ...string) {
+	set(c, newMessage(msg, "success", kv...))
 }
 
-func getSuccess(c echo.Context) *FlashMessage {
-	return get(c, flashSuccess)
+func FlashWarning(c echo.Context, msg string, kv ...string) {
+	set(c, newMessage(msg, "warning", kv...))
 }
 
-func getWarning(c echo.Context) *FlashMessage {
-	return get(c, flashWarning)
+func FlashError(c echo.Context, msg string, kv ...string) {
+	set(c, newMessage(msg, "error", kv...))
 }
 
-func getError(c echo.Context) *FlashMessage {
-	return get(c, flashErr)
+func set(c echo.Context, msg *FlashMessage) {
+	c.SetCookie(&http.Cookie{
+		Name:     flashCookieName,
+		Value:    msg.Encode(),
+		Path:     "/",
+		HttpOnly: true,
+	})
 }
 
-func get(c echo.Context, name string) *FlashMessage {
-	// resp := c.Response()
-	// kk := resp.Header().Get("Set-Cookie")
-
-	var cookie *http.Cookie
-	var err error
-
-	// if kk == "" {
-	cookie, err = c.Cookie(name)
+func get(c echo.Context) *FlashMessage {
+	cookie, err := c.Cookie(flashCookieName)
 	if err != nil {
 		return nil
 	}
-	// } else {
-	// 	cookies, err := http.ParseCookie(kk)
-	// 	if err != nil {
-	// 		cookie, err = c.Cookie(name)
-	// 		if err != nil {
-	// 			return nil
-	// 		}
-	// 	}
-
-	// 	for _, c := range cookies {
-	// 		if c.Name == name {
-	// 			cookie = c
-	// 			resp.Header().Del("Set-Cookie")
-	// 			break
-	// 		}
-	// 	}
-	// }
 
 	if cookie == nil {
 		return nil
@@ -153,17 +116,20 @@ func get(c echo.Context, name string) *FlashMessage {
 		return nil
 	}
 
+	return &m
+}
+
+func clear(c echo.Context) {
 	c.SetCookie(
 		&http.Cookie{
-			Name:    name,
-			MaxAge:  -1,
-			Expires: time.Unix(1, 0),
-			Value:   "",
-			Path:    "/",
+			Name:     flashCookieName,
+			Value:    "",
+			Path:     "/",
+			MaxAge:   -1,
+			Expires:  time.Unix(0, 0),
+			HttpOnly: true,
 		},
 	)
-
-	return &m
 }
 
 func encode(src []byte) string {
