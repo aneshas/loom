@@ -58,7 +58,7 @@ func (c *AppConfig) DBConn() (*sql.DB, error) {
 		return sql.Open("sqlite3", c.DB.Name+".db")
 	}
 
-	// TODO - add support for postgres
+	// TODO - add support for postgres - Use pgxpool
 	// c.PostgresDSN()
 
 	return nil, nil
