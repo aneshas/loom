@@ -9,13 +9,13 @@ import (
 // Deps represents the dependency registry
 type Deps struct {
 	mu       sync.RWMutex
-	services map[reflect.Type]map[string]interface{}
+	services map[reflect.Type]map[string]any
 }
 
 // NewDeps creates a new dependency registry
 func NewDeps() *Deps {
 	return &Deps{
-		services: make(map[reflect.Type]map[string]interface{}),
+		services: make(map[reflect.Type]map[string]any),
 	}
 }
 
@@ -192,7 +192,7 @@ func Count[T any](d *Deps) int {
 func (d *Deps) Clear() {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	d.services = make(map[reflect.Type]map[string]interface{})
+	d.services = make(map[reflect.Type]map[string]any)
 }
 
 // GetRegisteredTypes returns all registered types
