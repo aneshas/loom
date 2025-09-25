@@ -13,28 +13,37 @@ import (
 
 func main() {
 	rootCmd := &cobra.Command{
-		Use:   "goon",
-		Short: "Goon is an opinionated MVC web framework for Go — fast, simple, structured.",
-		Long:  `Goon is a fast, convention-over-configuration web framework for Go — built to get you from zero to working, deployable app with minimal setup and maximum clarity. It enforces structure, favors simplicity, and helps you ship faster without sacrificing maintainability.`,
+		Use:   "loom",
+		Short: "Loom is an opinionated MVC web framework for Go — fast, simple, structured.",
+		Long:  `Loom is a fast, convention-over-configuration web framework for Go — built to get you from zero to working, deployable app with minimal setup and maximum clarity. It enforces structure, favors simplicity, and helps you ship faster without sacrificing maintainability.`,
 	}
 
 	newCmd := &cobra.Command{
-		Use:   "new [APP_PATH]",
-		Short: "Generate a new goon web application",
-		Long: `Generate a new goon web application at the specified path.
+		Use:   "new [APP_NAME]",
+		Short: "Generate a new loom web application",
+		Long: `Generate a new loom web application with the specified name.
 This command will create a new directory with a complete web application structure,
 including all necessary files and configurations for a modern web app.
 
+The new application will be created in the current directory.
+
 Example:
-  goon new myapp
-  goon new ./myapp
-  goon new /path/to/myapp`,
+  loom new myapp
+  loom new myapp --module github.com/user/myapp
+  loom new my-awesome-app`,
 		Args: cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			appPath := args[0]
-			fmt.Printf("new command called with APP_PATH: %s - web app generation will be implemented here\n", appPath)
+			appName := args[0]
+			moduleName, _ := cmd.Flags().GetString("module")
+
+			if err := runNewCommand(appName, moduleName); err != nil {
+				fmt.Printf("Error creating new application: %v\n", err)
+				os.Exit(1)
+			}
 		},
 	}
+
+	newCmd.Flags().StringP("module", "m", "", "Go module name (default: app name)")
 
 	// DB command
 	dbCmd := &cobra.Command{
@@ -51,8 +60,8 @@ The command will automatically detect whether to use SQLite or PostgreSQL based 
 If no CONFIG argument is provided, it defaults to 'dev'.
 
 Example:
-  goon db migrate
-  goon db migrate [dev|production]`,
+  loom db migrate
+  loom db migrate [dev|production]`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			// configName := "dev" - TODO
@@ -99,10 +108,10 @@ Example:
 		Long: `Run all database seeders from ./scripts/seed.go file.
 
 Example:
-  goon db seed
-  goon db seed [dev|production]`,
+  loom db seed
+  loom db seed [dev|production]`,
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := os.MkdirAll("bin", 0755); err != nil {
+			if err := os.MkdirAll("bin", 0o755); err != nil {
 				fmt.Printf("Error creating bin directory: %v\n", err)
 				os.Exit(1)
 			}
@@ -155,4 +164,64 @@ func loadConfig() (*loom.AppConfig, error) {
 	}
 
 	return &cfg.AppConfig, nil
+}
+
+func runNewCommand(appName, moduleName string) error {
+	// Get current working directory
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get current directory: %w", err)
+	}
+
+	// Use app name as module name if not specified
+	if moduleName == "" {
+		moduleName = appName
+	}
+
+	fmt.Printf("Creating new Loom application '%s' with module '%s'...\n", appName, moduleName)
+
+	// Generate the project using embedded templates
+	if err := GenerateProject(appName, moduleName, cwd); err != nil {
+		return fmt.Errorf("failed to generate project: %w", err)
+	}
+
+	projectPath := filepath.Join(cwd, appName)
+
+	fmt.Printf("✓ Project structure created\n")
+
+	//
+	fmt.Printf("Running go mod replace ...\n") // only for dev
+	modRepl := exec.Command("go", "mod", "edit", "-replace", "github.com/aneshas/loom=../")
+	modRepl.Dir = projectPath
+	modRepl.Stdout = os.Stdout
+	modRepl.Stderr = os.Stderr
+
+	if err := modRepl.Run(); err != nil {
+		fmt.Printf("Warning: failed to run go mod replace: %v\n", err)
+	} else {
+		fmt.Printf("✓ Loom replaced\n")
+	}
+	//
+
+	// Run go mod tidy to clean up dependencies
+	fmt.Printf("Running go mod tidy...\n")
+	modTidyCmd := exec.Command("go", "mod", "tidy")
+	modTidyCmd.Dir = projectPath
+	modTidyCmd.Stdout = os.Stdout
+	modTidyCmd.Stderr = os.Stderr
+
+	if err := modTidyCmd.Run(); err != nil {
+		fmt.Printf("Warning: failed to run go mod tidy: %v\n", err)
+	} else {
+		fmt.Printf("✓ Dependencies resolved\n")
+	}
+
+	// Print success message and next steps
+	fmt.Printf("\n🎉 Successfully created '%s'!\n\n", appName)
+	fmt.Printf("Next steps:\n")
+	fmt.Printf("  cd %s\n", appName)
+	fmt.Printf("  go run cmd/%s/main.go\n\n", appName)
+	fmt.Printf("Your new Loom application will be available at http://localhost:8080\n")
+
+	return nil
 }

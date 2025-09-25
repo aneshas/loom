@@ -1,1 +1,5 @@
 .idea/
+cmd/loom/templates/
+app/
+*.out
+bin/

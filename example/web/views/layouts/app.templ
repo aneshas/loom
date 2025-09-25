@@ -1,0 +1,29 @@
+package layouts
+
+import "github.com/aneshas/helloapp/web/views/components"
+
+templ App(content templ.Component) {
+	@components.FlashGroup()
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
+		<div class="container">
+			<a class="navbar-brand" href="/">Loom</a>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				// <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+				// 	<li class="nav-item">
+				// 		<a class="nav-link active" aria-current="page" href="/users">Users</a>
+				// 	</li>
+				// 	<li class="nav-item">
+				// 		<a class="nav-link" href="/xxx">Not Found</a>
+				// 	</li>
+				// </ul>
+			</div>
+		</div>
+	</nav>
+	@content
+	<!-- Footer -->
+	<footer class="footer mt-auto py-3 bg-dark text-light">
+		<div class="container text-center">
+			<small>&copy; 2025 Loom Framework — Built with Go &amp; Bootstrap 5</small>
+		</div>
+	</footer>
+}

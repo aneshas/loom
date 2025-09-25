@@ -1,0 +1,184 @@
+:root {
+    --bs-primary: #ff6b6b; /* Sunset Red */
+    --bs-secondary: #ffe66d; /* Golden Glow */
+    --bs-success: #4ecdc4; /* Mint Teal */
+    --bs-info: #1a535c; /* Deep Teal */
+    --bs-warning: #ffa630; /* Orange */
+    --bs-danger: #c9184a; /* Crimson */
+    --bs-light: #fdfdfd;
+    --bs-dark: #2b2d42; /* Slate */
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+}
+.btn-secondary {
+    background-color: var(--bs-secondary) !important;
+    border-color: var(--bs-secondary) !important;
+}
+.btn-success {
+    background-color: var(--bs-success) !important;
+    border-color: var(--bs-success) !important;
+}
+.btn-info {
+    background-color: var(--bs-info) !important;
+    border-color: var(--bs-info) !important;
+}
+.btn-warning {
+    background-color: var(--bs-warning) !important;
+    border-color: var(--bs-warning) !important;
+}
+.btn-danger {
+    background-color: var(--bs-danger) !important;
+    border-color: var(--bs-danger) !important;
+}
+.btn-light {
+    background-color: var(--bs-light) !important;
+    border-color: var(--bs-light) !important;
+    color: #000 !important;
+}
+.btn-dark {
+    background-color: var(--bs-dark) !important;
+    border-color: var(--bs-dark) !important;
+}
+
+/* Background utilities */
+.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+.bg-secondary {
+    background-color: var(--bs-secondary) !important;
+}
+.bg-success {
+    background-color: var(--bs-success) !important;
+}
+.bg-info {
+    background-color: var(--bs-info) !important;
+}
+.bg-warning {
+    background-color: var(--bs-warning) !important;
+}
+.bg-danger {
+    background-color: var(--bs-danger) !important;
+}
+.bg-light {
+    background-color: var(--bs-light) !important;
+}
+.bg-dark {
+    background-color: var(--bs-dark) !important;
+}
+
+/* Text utilities */
+.text-primary {
+    color: var(--bs-primary) !important;
+}
+.text-secondary {
+    color: var(--bs-secondary) !important;
+}
+.text-success {
+    color: var(--bs-success) !important;
+}
+.text-info {
+    color: var(--bs-info) !important;
+}
+.text-warning {
+    color: var(--bs-warning) !important;
+}
+.text-danger {
+    color: var(--bs-danger) !important;
+}
+.text-light {
+    color: var(--bs-light) !important;
+}
+.text-dark {
+    color: var(--bs-dark) !important;
+}
+
+/* Alerts */
+.alert-primary {
+    background-color: var(--bs-primary) !important;
+    color: #fff !important;
+}
+.alert-secondary {
+    background-color: var(--bs-secondary) !important;
+    color: #fff !important;
+}
+.alert-success {
+    background-color: var(--bs-success) !important;
+    color: #fff !important;
+}
+.alert-info {
+    background-color: var(--bs-info) !important;
+    color: #fff !important;
+}
+.alert-warning {
+    background-color: var(--bs-warning) !important;
+    color: #000 !important;
+}
+.alert-danger {
+    background-color: var(--bs-danger) !important;
+    color: #fff !important;
+}
+.alert-light {
+    background-color: var(--bs-light) !important;
+    color: #000 !important;
+}
+.alert-dark {
+    background-color: var(--bs-dark) !important;
+    color: #fff !important;
+}
+
+/* Badges */
+.badge.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+.badge.bg-secondary {
+    background-color: var(--bs-secondary) !important;
+}
+.badge.bg-success {
+    background-color: var(--bs-success) !important;
+}
+.badge.bg-info {
+    background-color: var(--bs-info) !important;
+}
+.badge.bg-warning {
+    background-color: var(--bs-warning) !important;
+}
+.badge.bg-danger {
+    background-color: var(--bs-danger) !important;
+}
+.badge.bg-light {
+    background-color: var(--bs-light) !important;
+    color: #000 !important;
+}
+.badge.bg-dark {
+    background-color: var(--bs-dark) !important;
+}
+
+/* Navbar */
+.navbar.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+.navbar.bg-secondary {
+    background-color: var(--bs-secondary) !important;
+}
+.navbar.bg-success {
+    background-color: var(--bs-success) !important;
+}
+.navbar.bg-info {
+    background-color: var(--bs-info) !important;
+}
+.navbar.bg-warning {
+    background-color: var(--bs-warning) !important;
+}
+.navbar.bg-danger {
+    background-color: var(--bs-danger) !important;
+}
+.navbar.bg-light {
+    background-color: var(--bs-light) !important;
+}
+.navbar.bg-dark {
+    background-color: var(--bs-dark) !important;
+}
