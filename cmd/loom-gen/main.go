@@ -87,6 +87,8 @@ func shouldSkipDB(path string) bool {
 
 func transformPath(path string) string {
 	// Transform specific paths
+
+	// this too
 	path = strings.ReplaceAll(path, "cmd/helloapp", "cmd/app")
 	path = strings.ReplaceAll(path, "helloapp", "{{.AppName}}")
 
@@ -174,6 +176,8 @@ func applyReplacements(content string) string {
 	return content
 }
 
+// TODO - this should be in template transformations
+
 func removeDBContent(content string) string {
 	lines := strings.Split(content, "\n")
 	var result []string
@@ -190,8 +194,8 @@ func removeDBContent(content string) string {
 			continue
 		}
 
-		// Skip replace directive for development
-		if strings.Contains(line, "replace github.com/aneshas/loom") {
+		// Skip replace directive for development /
+		if strings.Contains(line, "replace github.com/aneshas/loom") && os.Getenv("LOOM_DEV") == "" {
 			continue
 		}
 

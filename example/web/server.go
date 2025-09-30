@@ -7,12 +7,6 @@ import (
 
 // ConfigureServer is where we configure the echo server and global middleware
 func ConfigureServer(g *loom.Loom) {
-	// request logger
-	// error handler
-	// cache
-	// request id
-	// telemetry
-
 	g.E.HideBanner = true
 
 	g.E.Use(
