@@ -1,0 +1,32 @@
+package contacts
+
+import "github.com/aneshas/helloapp/web/views/components"
+
+type attr = templ.Attributes
+
+templ Form(m components.FormModel) {
+	<div class="container">
+		<div class="row justify-content-md-center">
+			<div class="col col-md-6">
+				<h1 class="mb-4">New Task</h1>
+				@components.Form(m, "form-example", "/contacts") {
+					@components.Input(
+						m, "text", "name",
+						attr{"label": "Enter name", "placeholder": "Your Name"},
+					)
+					@components.Input(
+						m, "email", "email",
+						attr{"label": "Enter email"},
+					)
+					@components.Input(
+						m, "phone", "phone",
+						attr{"help": "+91 XXXXXXXXX", "required": ""},
+					)
+					@components.Button() {
+						Submit
+					}
+				}
+			</div>
+		</div>
+	</div>
+}

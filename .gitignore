@@ -1,5 +1,6 @@
 .idea/
 cmd/loom/templates/
 app/
+my-app/
 *.out
 bin/

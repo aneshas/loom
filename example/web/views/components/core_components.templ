@@ -1,6 +1,9 @@
 package components
 
-import "github.com/aneshas/loom"
+import (
+	"fmt"
+	"github.com/aneshas/loom"
+)
 
 templ FlashGroup() {
 	{{ flash, ok := ctx.Value(loom.FlashKey{}).(*loom.FlashMessage) }}
@@ -11,16 +14,16 @@ templ FlashGroup() {
 
 templ flashMessage(message string, t string) {
 	{{
-	variant := "success"
+		variant := "success"
 
-	switch t {
-	case "error":
-		variant = "danger"
-	case "warning":
-		variant = "warning"
-	}
+		switch t {
+		case "error":
+			variant = "danger"
+		case "warning":
+			variant = "warning"
+		}
 
-	class := "m-4 position-absolute top-0 end-0 toast align-items-center text-dark border-2 z-1 bg-" + variant
+		class := "m-4 position-absolute top-0 end-0 toast align-items-center text-dark border-2 z-1 bg-" + variant
 	}}
 	<div class={ class } role="alert" aria-live="assertive" aria-atomic="true">
 		<div class="d-flex">
@@ -31,3 +34,96 @@ templ flashMessage(message string, t string) {
 		</div>
 	</div>
 }
+
+// Add wherever you want to use it
+// type attrs = templ.Attributes
+
+type FormModel struct {
+	Action string
+	Values map[string]string
+	Errors map[string]string
+}
+
+templ Form(model FormModel, id string, url string, attrs ...templ.Attributes) {
+	{{
+		/* Extract attributes and assign default values
+		omit nil values*/
+		var rest templ.Attributes
+	}}
+	<form id={ id } action={ url } method="POST" { rest... }>
+		{{ csrf, _ := ctx.Value("csrf").(string) }}
+		<input type="hidden" name="_csrf" value={ csrf }/>
+		{ children... }
+	</form>
+}
+
+templ Input(model FormModel, t, name string, attrs ...templ.Attributes) {
+	{{
+		// TODO - check form model values and errors for nil and make
+
+		rest := templ.Attributes{}
+
+		id := fmt.Sprintf("%s_%s", model.Action, name)
+		idHelp := fmt.Sprintf("%s_%s", id, "help")
+
+		label := name
+		help := ""
+
+		for _, attr := range attrs {
+			if val, ok := attr["label"]; ok {
+				label = val.(string)
+				delete(attr, "label")
+			}
+
+			if val, ok := attr["help"]; ok {
+				help = val.(string)
+				delete(attr, "help")
+			}
+
+			for k, v := range attr {
+				rest[k] = v
+			}
+		}
+
+		isInvalid := ""
+
+		if _, ok := model.Errors[name]; ok {
+			isInvalid = "is-invalid"
+		}
+
+		isValid := ""
+
+		if _, ok := model.Values[name]; ok && isInvalid == "" {
+			isValid = "is-valid"
+		}
+
+		class := fmt.Sprintf("form-control %s %s", isValid, isInvalid)
+
+		value := ""
+
+		if val, ok := model.Values[name]; ok {
+			value = val
+		}
+	}}
+	<div class="mb-3">
+		<label for={ id } class="form-label">{ label }</label>
+		<input type={ t } name={ name } class={ class } id={ id } aria-describedby={ idHelp } value={ value } { rest... }/>
+		<div id={ idHelp } class="form-text">{ help }</div>
+		if err, ok := model.Errors[name]; ok {
+			<div class="invalid-feedback">{ err }</div>
+		}
+	</div>
+}
+
+templ Button(attrs ...templ.Attributes) {
+	{{
+		/* Extract attributes and assign default values
+		omit nil values*/
+		var rest templ.Attributes
+	}}
+	<button type="submit" class="btn btn-primary" { rest... }>
+		{ children... }
+	</button>
+}
+
+// Link and based on that NavLink with active class

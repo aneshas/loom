@@ -45,6 +45,50 @@ Example:
 
 	newCmd.Flags().StringP("module", "m", "", "Go module name (default: app name)")
 
+	depsCmd := &cobra.Command{
+		Use:   "deps",
+		Short: "Install dev dependencies",
+		Long: `Install development dependencies for the application.
+
+Example:
+  loom deps`,
+		Run: func(cmd *cobra.Command, args []string) {
+			cwd, err := os.Getwd()
+			if err != nil {
+				fmt.Printf("failed to get current directory: %v", err)
+				os.Exit(1)
+			}
+
+			runDepsCommand(cwd)
+		},
+	}
+
+	runCmd := &cobra.Command{
+		Use:   "run",
+		Short: "Run the application",
+		Long: `Run the application using .air.toml configuration.
+
+Example:
+  loom run`,
+		Run: func(cmd *cobra.Command, args []string) {
+			cwd, err := os.Getwd()
+			if err != nil {
+				fmt.Printf("failed to get current directory: %v", err)
+				os.Exit(1)
+			}
+
+			fmt.Printf("Running application...\n")
+
+			runCmd := newCMD("go", "tool", "air")
+			runCmd.Dir = cwd
+
+			if err := runCmd.Run(); err != nil {
+				fmt.Printf("Warning: %v\n", err)
+				os.Exit(1)
+			}
+		},
+	}
+
 	// DB command
 	dbCmd := &cobra.Command{
 		Use:   "db",
@@ -62,7 +106,7 @@ If no CONFIG argument is provided, it defaults to 'dev'.
 Example:
   loom db migrate
   loom db migrate [dev|production]`,
-		Args: cobra.MaximumNArgs(1),
+		Args: cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			// configName := "dev" - TODO
 
@@ -101,6 +145,35 @@ Example:
 			fmt.Println("Database migrations completed successfully!")
 		},
 	}
+
+	genMigrationCmd := &cobra.Command{
+		Use:   "gen-migration description",
+		Short: "Generate a new migration file",
+		Long: `Generate a new migration file with the given description.
+
+Example:
+  loom db gen-migration "Add users table"]`,
+		Args: cobra.MaximumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			if len(args) == 0 {
+				fmt.Println("Error: Description is required")
+				os.Exit(1)
+			}
+
+			err := db.GenMigration(args[0])
+			if err != nil {
+				fmt.Printf("Error generating migration: %v\n", err)
+				os.Exit(1)
+			}
+
+			fmt.Println("Migration generated successfully!")
+		},
+	}
+
+	//
+	// next - implement the store template
+	//
+	// next - generate store based on the sqlboiler model
 
 	seedCmd := &cobra.Command{
 		Use:   "seed",
@@ -141,10 +214,8 @@ Example:
 		},
 	}
 
-	dbCmd.AddCommand(migrateCmd)
-	dbCmd.AddCommand(seedCmd)
-
-	rootCmd.AddCommand(newCmd, dbCmd)
+	dbCmd.AddCommand(migrateCmd, genMigrationCmd, seedCmd)
+	rootCmd.AddCommand(newCmd, depsCmd, runCmd, dbCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -164,6 +235,70 @@ func loadConfig() (*loom.AppConfig, error) {
 	}
 
 	return &cfg.AppConfig, nil
+}
+
+func runDepsCommand(path string) error {
+	fmt.Println("Running dependencies installation...")
+
+	{
+		fmt.Printf("Installing sqlboiler...\n")
+
+		cmd := newCMD("go", "get", "-tool", "github.com/aarondl/sqlboiler/v4@v4.19.5")
+		cmd.Dir = path
+
+		if err := cmd.Run(); err != nil {
+			fmt.Printf("Warning: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	{
+		fmt.Printf("Installing air...\n")
+
+		cmd := newCMD("go", "get", "-tool", "github.com/air-verse/air@v1.63.0")
+		cmd.Dir = path
+
+		if err := cmd.Run(); err != nil {
+			fmt.Printf("Warning: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	{
+		fmt.Printf("Installing templ...\n")
+
+		cmd := newCMD("go", "get", "-tool", "github.com/a-h/templ/cmd/templ@v0.3.943")
+		cmd.Dir = path
+
+		if err := cmd.Run(); err != nil {
+			fmt.Printf("Warning: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	{
+		fmt.Printf("Running go mod tidy...\n")
+
+		cmd := newCMD("go", "mod", "tidy")
+		cmd.Dir = path
+
+		if err := cmd.Run(); err != nil {
+			fmt.Printf("Warning: failed to run go mod tidy: %v\n", err)
+			os.Exit(1)
+		}
+	}
+
+	fmt.Println("✓ Dependencies installed")
+	return nil
+}
+
+func newCMD(name string, args ...string) *exec.Cmd {
+	cmd := exec.Command(name, args...)
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 }
 
 func runNewCommand(appName, moduleName string) error {
@@ -203,25 +338,14 @@ func runNewCommand(appName, moduleName string) error {
 	}
 	//
 
-	// Run go mod tidy to clean up dependencies
-	fmt.Printf("Running go mod tidy...\n")
-	modTidyCmd := exec.Command("go", "mod", "tidy")
-	modTidyCmd.Dir = projectPath
-	modTidyCmd.Stdout = os.Stdout
-	modTidyCmd.Stderr = os.Stderr
-
-	if err := modTidyCmd.Run(); err != nil {
-		fmt.Printf("Warning: failed to run go mod tidy: %v\n", err)
-	} else {
-		fmt.Printf("✓ Dependencies resolved\n")
-	}
+	runDepsCommand(projectPath)
 
 	// Print success message and next steps
 	fmt.Printf("\n🎉 Successfully created '%s'!\n\n", appName)
 	fmt.Printf("Next steps:\n")
 	fmt.Printf("  cd %s\n", appName)
-	fmt.Printf("  go run cmd/%s/main.go\n\n", appName)
-	fmt.Printf("Your new Loom application will be available at http://localhost:8080\n")
+	fmt.Printf("  loom run\n\n")
+	fmt.Printf("Your new Loom application will run using .air.toml configuration\n")
 
 	return nil
 }
