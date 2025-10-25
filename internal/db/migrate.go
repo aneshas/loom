@@ -32,11 +32,10 @@ func GenMigration(description string) error {
 
 	migrationsPath := "internal/db/migrations"
 
-	// check if there are any files in internal/db/migrations
 	files, err := os.ReadDir(migrationsPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			err = os.Mkdir(migrationsPath, 0755)
+			err = os.MkdirAll(migrationsPath, 0755)
 			if err != nil {
 				return err
 			}

@@ -118,14 +118,7 @@ func flashMessage(message string, t string) templ.Component {
 
 // Add wherever you want to use it
 // type attrs = templ.Attributes
-
-type FormModel struct {
-	Action string
-	Values map[string]string
-	Errors map[string]string
-}
-
-func Form(model FormModel, id string, url string, attrs ...templ.Attributes) templ.Component {
+func Form(model loom.ViewModel, id string, url string, attrs ...templ.Attributes) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -157,7 +150,7 @@ func Form(model FormModel, id string, url string, attrs ...templ.Attributes) tem
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 53, Col: 14}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 46, Col: 14}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -170,7 +163,7 @@ func Form(model FormModel, id string, url string, attrs ...templ.Attributes) tem
 		var templ_7745c5c3_Var8 templ.SafeURL
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(url)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 53, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 46, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -196,7 +189,7 @@ func Form(model FormModel, id string, url string, attrs ...templ.Attributes) tem
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 55, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 48, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -218,7 +211,7 @@ func Form(model FormModel, id string, url string, attrs ...templ.Attributes) tem
 	})
 }
 
-func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Component {
+func Input(model loom.ViewModel, t, name string, attrs ...templ.Attributes) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -244,7 +237,7 @@ func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Com
 
 		rest := templ.Attributes{}
 
-		id := fmt.Sprintf("%s_%s", model.Action, name)
+		id := fmt.Sprintf("form_field_%s", name)
 		idHelp := fmt.Sprintf("%s_%s", id, "help")
 
 		label := name
@@ -292,7 +285,7 @@ func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Com
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 109, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 102, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -305,7 +298,7 @@ func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Com
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 109, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 102, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -327,7 +320,7 @@ func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Com
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(t)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 110, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 103, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -340,7 +333,7 @@ func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Com
 		var templ_7745c5c3_Var15 string
 		templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 110, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 103, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 		if templ_7745c5c3_Err != nil {
@@ -366,7 +359,7 @@ func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Com
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 110, Col: 57}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 103, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 		if templ_7745c5c3_Err != nil {
@@ -379,7 +372,7 @@ func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Com
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(idHelp)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 110, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 103, Col: 85}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -392,7 +385,7 @@ func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Com
 		var templ_7745c5c3_Var19 string
 		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 110, Col: 101}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 103, Col: 101}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -413,7 +406,7 @@ func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Com
 		var templ_7745c5c3_Var20 string
 		templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(idHelp)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 111, Col: 18}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 104, Col: 18}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 		if templ_7745c5c3_Err != nil {
@@ -426,7 +419,7 @@ func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Com
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(help)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 111, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 104, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -444,7 +437,7 @@ func Input(model FormModel, t, name string, attrs ...templ.Attributes) templ.Com
 			var templ_7745c5c3_Var22 string
 			templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(err)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 113, Col: 38}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/views/components/core_components.templ`, Line: 106, Col: 38}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 			if templ_7745c5c3_Err != nil {

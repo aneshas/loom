@@ -170,7 +170,6 @@ Example:
 		},
 	}
 
-	//
 	// next - implement the store template
 	//
 	// next - generate store based on the sqlboiler model

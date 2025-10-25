@@ -14,7 +14,12 @@ import (
 func main() {
 	cfg := loom.MustLoadConfig[config.Config]("./config")
 
+	conn, err := cfg.DBConn()
+	check(err)
+
 	deps := loom.NewDeps()
+
+	loom.Add(deps, conn)
 
 	l := loom.New(deps)
 

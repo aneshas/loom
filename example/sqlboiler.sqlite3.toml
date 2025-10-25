@@ -1,0 +1,9 @@
+output   = "internal/db/model"
+pkgname  = "model"
+wipe     = true
+no-tests = true
+add-enum-types = true
+
+[sqlite3]
+  dbname = "sqlite.db"
+  blacklist = ["schema_migrations"]

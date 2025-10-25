@@ -37,14 +37,7 @@ templ flashMessage(message string, t string) {
 
 // Add wherever you want to use it
 // type attrs = templ.Attributes
-
-type FormModel struct {
-	Action string
-	Values map[string]string
-	Errors map[string]string
-}
-
-templ Form(model FormModel, id string, url string, attrs ...templ.Attributes) {
+templ Form(model loom.ViewModel, id string, url string, attrs ...templ.Attributes) {
 	{{
 		/* Extract attributes and assign default values
 		omit nil values*/
@@ -57,13 +50,13 @@ templ Form(model FormModel, id string, url string, attrs ...templ.Attributes) {
 	</form>
 }
 
-templ Input(model FormModel, t, name string, attrs ...templ.Attributes) {
+templ Input(model loom.ViewModel, t, name string, attrs ...templ.Attributes) {
 	{{
 		// TODO - check form model values and errors for nil and make
 
 		rest := templ.Attributes{}
 
-		id := fmt.Sprintf("%s_%s", model.Action, name)
+		id := fmt.Sprintf("form_field_%s", name)
 		idHelp := fmt.Sprintf("%s_%s", id, "help")
 
 		label := name

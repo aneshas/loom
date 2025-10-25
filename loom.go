@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/go-playground/form"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -62,8 +64,14 @@ func Register[T any](l *Loom) {
 
 	if field, found := structType.FieldByName("Deps"); found {
 		ctrl := Controller{
-			Deps: l.Deps,
+			Deps:        l.Deps,
+			FormDecoder: form.NewDecoder(),
+			Validator:   validator.New(validator.WithRequiredStructEnabled()),
 		}
+
+		ctrl.Validator.RegisterTagNameFunc(func(fld reflect.StructField) string {
+			return strings.SplitN(fld.Tag.Get("form"), ",", 2)[0]
+		})
 
 		gField := controllerValue.Field(field.Index[0])
 		if gField.CanSet() {
@@ -94,6 +102,15 @@ func Register[T any](l *Loom) {
 // "users.index"
 func (l *Loom) GET(path string, ctrlAction string, m ...echo.MiddlewareFunc) *echo.Route {
 	return l.E.GET(path, l.handlerFor(ctrlAction), m...)
+}
+
+// POST registers a new POST route for a path with a matching handler in the router
+// with optional route-level middleware.
+//
+// ctrlAction is the name of the controller action pair to be called (lowercased and without Controller suffix):
+// "users.index"
+func (l *Loom) POST(path string, ctrlAction string, m ...echo.MiddlewareFunc) *echo.Route {
+	return l.E.POST(path, l.handlerFor(ctrlAction), m...)
 }
 
 func (l *Loom) handlerFor(ctrlAction string) echo.HandlerFunc {
