@@ -214,7 +214,30 @@ Example:
 	}
 
 	dbCmd.AddCommand(migrateCmd, genMigrationCmd, seedCmd)
-	rootCmd.AddCommand(newCmd, depsCmd, runCmd, dbCmd)
+
+	scaffoldCmd := &cobra.Command{
+		Use:   "scaffold [ModelName]",
+		Short: "Generate a model with standard Go types from SQLBoiler model",
+		Long: `Generate a model file with standard Go types based on a SQLBoiler model.
+The command will read the model from internal/db/model package and generate a new file
+in web/controller directory with standard Go types, validation tags, and mapper methods.
+
+Example:
+  loom scaffold Contact`,
+		Args: cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			modelName := args[0]
+
+			if err := runScaffoldCommand(modelName); err != nil {
+				fmt.Printf("Error scaffolding model: %v\n", err)
+				os.Exit(1)
+			}
+
+			fmt.Printf("✓ Successfully scaffolded %s model\n", modelName)
+		},
+	}
+
+	rootCmd.AddCommand(newCmd, depsCmd, runCmd, dbCmd, scaffoldCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

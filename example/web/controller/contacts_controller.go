@@ -4,9 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/aarondl/null/v8"
 	"github.com/aarondl/sqlboiler/v4/boil"
-	"github.com/aneshas/helloapp/internal/db/model"
 	"github.com/aneshas/helloapp/web/views"
 	"github.com/aneshas/helloapp/web/views/contacts"
 	"github.com/aneshas/loom"
@@ -44,13 +42,9 @@ func (ctrl *ContactsController) Post(c echo.Context) error {
 		return views.Render(c, contacts.Form(m))
 	}
 
-	dbContact := model.Contact{
-		Name:  contact.Name,
-		Email: contact.Email,
-		Phone: null.StringFromPtr(contact.Phone),
-	}
+	ctx := c.Request().Context()
 
-	err = dbContact.Insert(c.Request().Context(), ctrl.db, boil.Infer())
+	err = contact.ToDB().Insert(ctx, ctrl.db, boil.Infer())
 	if err != nil {
 		loom.FlashErrorNow(c, err.Error()) // generic message but log the error for debugging
 		return views.Render(c, contacts.Form(m))
