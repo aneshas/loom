@@ -106,6 +106,7 @@ https://hyperflask.dev/roadmap/
 - [ ] finish crud example end to end - crud and see then how the puzzle fits together
 - [ ] Always add database (config, boiler toml, and main + seed)
 - [ ] db scaffold contact (calls db migrate db gen-boiler gen-model and db gen-store) (minimum custom components)
+- [ ] db scaffold --api contact contacts_api_controller.go
 - [ ] and this view model can be auto generated from sqlboiler models
 - [ ] controller actions map directly from view model to db (users can add layers in the middle themselves eg. store, services, usecases, etc... - we can add generators later)
 
